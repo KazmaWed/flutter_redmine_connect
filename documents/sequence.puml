@@ -1,0 +1,60 @@
+@startuml
+
+' -------------------- スタイル --------------------
+
+' 共通スタイル
+skinparam roundcorner 8
+skinparam shadowing false
+skinparam padding 2
+skinparam defaultFontName Osaka
+skinparam monochrome true
+
+skinparam class {
+  BackgroundColor White
+  BorderColor Gray
+}
+
+' -------------------- シーケンス --------------------
+
+Participant Flutter_App as app
+Participant Firebase_Auth as auth
+Participant GAS as gas
+Participant Redmine_API as rm
+
+rnote over app: ログイン画面\nemail, passwordを入力
+app -> auth: emailとpassword送信
+rnote over auth: 認証
+auth -> app: idToken送信
+
+rnote over app: 機密情報入力画面\n機密情報入力
+app -> gas: idTokenと機密情報を送信
+gas -> auth: idTokenを送信
+rnote over auth: 認証
+auth -> gas: 認証結果送信
+
+gas -> rm: チケット情報(機密情報)を送信
+rnote over rm: チケット作成
+rm -> gas: レスポンス
+gas -> app: レスポンス
+
+' card -> vm: cardのindexを通知
+
+' rnote over vm
+' select(index)
+' - cardStateListを更新
+' endnote
+
+' vm -> card: callback()を渡す\nアニメーションの種類を決定
+
+' rnote over card
+' faceUpAnimation()
+' or faceDownAnimation()
+' endnote
+
+' card -> vm:
+
+' rnote over vm: callback()
+
+' vm -> field: 必要であればcardStateList通知
+
+@enduml
